@@ -1,9 +1,9 @@
 package main
 
 import (
+	"github.com/mathew/advent-of-code-2019/internal/pkg/converters"
 	"github.com/mathew/advent-of-code-2019/internal/pkg/files"
 	"log"
-	"strconv"
 )
 
 func calculateFuel(mass int) int {
@@ -21,16 +21,12 @@ func sum(fuels ...int) int {
 
 func main() {
 	rawMasses := files.Load("cmd/day1/input1.txt")
-	var masses []int
+	var modules []int
 
-	for _, m := range rawMasses {
-		r, err := strconv.Atoi(m)
-		if err != nil {
-			log.Fatalf("Cannot convert: %s", m)
-		}
-
-		masses = append(masses, calculateFuel(r))
+	for _, rm := range rawMasses {
+		m := converters.StringToInt(rm)
+		modules = append(modules, calculateFuel(m))
 	}
 
-	log.Print(sum(masses...))
+	log.Print(sum(modules...))
 }

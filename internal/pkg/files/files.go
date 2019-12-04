@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func Load(filePath string) []string {
+func Load(filePath string, separator string) []string {
 	absPath, _ := filepath.Abs(filePath)
 	dat, err := ioutil.ReadFile(absPath)
 
@@ -15,5 +15,5 @@ func Load(filePath string) []string {
 		log.Fatal(err)
 	}
 
-	return strings.Split(string(dat), "\n")
+	return strings.Split(string(dat), separator)
 }

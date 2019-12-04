@@ -34,7 +34,7 @@ func calculateModuleFuel(f int) int {
 }
 
 func main() {
-	rawMasses := files.Load("cmd/day1/input1.txt")
+	rawMasses := files.Load("cmd/day1/input1.txt", "\n")
 	var modules []int
 	var totalModules []int
 

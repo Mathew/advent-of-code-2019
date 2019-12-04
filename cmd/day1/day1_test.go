@@ -26,7 +26,6 @@ var calculateFuelTests = []struct {
 		33583,
 	},
 }
-
 func TestCalculateFuel(t *testing.T) {
 	for _, ft := range calculateFuelTests {
 		asserts.Equals(t, ft.result, calculateFuel(ft.mass))
@@ -35,4 +34,27 @@ func TestCalculateFuel(t *testing.T) {
 
 func TestSumFuel(t *testing.T) {
 	asserts.Equals(t, 6, sum(1, 2, 3))
+}
+
+var calculateModuleFuelTests = []struct {
+	mass   int
+	result int
+}{
+	{
+		14,
+		2,
+	},
+	{
+		1969,
+		966,
+	},
+	{
+		100756,
+		50346,
+	},
+}
+func TestCalculateModuleFuel(t *testing.T) {
+	for _, ft := range calculateModuleFuelTests {
+		asserts.Equals(t, ft.result, calculateModuleFuel(ft.mass))
+	}
 }

@@ -19,14 +19,31 @@ func sum(fuels ...int) int {
 	return fs
 }
 
+func calculateModuleFuel(f int) int {
+	tf := 0
+
+	for ok := true; ok; ok = f > 0 {
+		f = calculateFuel(f)
+
+		if f > 0 {
+			tf += f
+		}
+	}
+
+	return tf
+}
+
 func main() {
 	rawMasses := files.Load("cmd/day1/input1.txt")
 	var modules []int
+	var totalModules []int
 
 	for _, rm := range rawMasses {
 		m := converters.StringToInt(rm)
 		modules = append(modules, calculateFuel(m))
+		totalModules = append(totalModules, calculateModuleFuel(m))
 	}
 
-	log.Print(sum(modules...))
+	log.Printf("Total fuel (part 1): %v", sum(modules...))
+	log.Printf("Total module fuel (part 2): %v", sum(totalModules...))
 }

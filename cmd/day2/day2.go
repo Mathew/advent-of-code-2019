@@ -8,17 +8,20 @@ import (
 
 type IntCodeProgram struct {
 	intCodes []int
-	position int
+	pointer  int
 	running  bool
 }
 
-func NewIntCodeProgram(intCodes []int) IntCodeProgram {
+func NewIntCodeProgram(intCodes []int, noun int, verb int) IntCodeProgram {
 	arr := make([]int, len(intCodes))
 	copy(arr, intCodes)
 
+	arr[1] = noun
+	arr[2] = verb
+
 	return IntCodeProgram{
 		intCodes: arr,
-		position: 0,
+		pointer:  0,
 		running:  false,
 	}
 }
@@ -28,17 +31,17 @@ func (p IntCodeProgram) getIntCodeValue(pos int) int {
 }
 
 func (p *IntCodeProgram) add() {
-	r := p.getIntCodeValue(p.position + 1) + p.getIntCodeValue(p.position + 2)
-	p.intCodes[p.intCodes[p.position + 3]] = r
+	r := p.getIntCodeValue(p.pointer+1) + p.getIntCodeValue(p.pointer+2)
+	p.intCodes[p.intCodes[p.pointer+3]] = r
 
-	p.position += 4
+	p.pointer += 4
 }
 
 func (p *IntCodeProgram) multiply() {
-	r := p.getIntCodeValue(p.position + 1) * p.getIntCodeValue(p.position + 2)
-	p.intCodes[p.intCodes[p.position + 3]] = r
+	r := p.getIntCodeValue(p.pointer+1) * p.getIntCodeValue(p.pointer+2)
+	p.intCodes[p.intCodes[p.pointer+3]] = r
 
-	p.position += 4
+	p.pointer += 4
 }
 
 func (p *IntCodeProgram) stop() {
@@ -49,7 +52,7 @@ func (p *IntCodeProgram) Execute() {
 	p.running = true
 
 	for ok := true; ok; ok = p.running {
-		op := p.intCodes[p.position]
+		op := p.intCodes[p.pointer]
 
 		switch op {
 		case 1:
@@ -64,15 +67,28 @@ func (p *IntCodeProgram) Execute() {
 	}
 }
 
+func partTwo(intCodes []int) {
+	for noun :=0; noun < 100; noun++ {
+		for verb :=0; verb < 100; verb++ {
+			p := NewIntCodeProgram(intCodes, noun, verb)
+			p.Execute()
+
+			if p.intCodes[0] == 19690720 {
+				log.Printf("Noun: %v Verb: %v", noun, verb)
+				break
+			}
+		}
+	}
+}
+
 func main() {
 	rawIntCodes := files.Load("cmd/day2/input.txt", ",")
 	intCodes := converters.StringsToInts(rawIntCodes...)
 
-	intCodes[1] = 12
-	intCodes[2] = 2
-
-	prog := NewIntCodeProgram(intCodes)
+	prog := NewIntCodeProgram(intCodes, 12, 2)
 	prog.Execute()
 
 	log.Println(prog.intCodes[0])
+
+	partTwo(intCodes)
 }

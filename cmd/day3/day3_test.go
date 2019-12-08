@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/mathew/advent-of-code-2019/internal/pkg/asserts"
 	"testing"
 )
@@ -29,7 +30,9 @@ var wirePaths = []struct {
 
 func TestFindDistance(t *testing.T) {
 	for _, wP := range wirePaths {
-		d := findDistanceToClosestIntersection(wP.first, wP.second)
+		wireA, wireB := createWires(wP.first, wP.second)
+		points := wireA.Intersections(wireB)
+		d := getClosestIntersection(points)
 		asserts.Equals(t, wP.exp, d)
 	}
 }
@@ -183,5 +186,87 @@ func TestLine_Intersects(t *testing.T) {
 		if ok {
 			asserts.Assert(t, ni.point == p, "Name: %v, Exp %v got $v", ni.name, ni.point, p)
 		}
+	}
+}
+
+var stepsCountTests = []struct {
+	name      int
+	lines     []Line
+	intersect Point
+	steps     int
+}{
+	{
+		1,
+		[]Line{
+			NewLine(NewPoint(0, 0), NewPoint(8, 0), NewVector(7, 0)),
+			NewLine(NewPoint(1, 7), NewPoint(1, 0), NewVector(0, -7)),
+		},
+		NewPoint(1, 0),
+		1,
+	},
+	{
+		2,
+		[]Line{NewLine(NewPoint(8, 0), NewPoint(1, 0), NewVector(-7, 0))},
+		NewPoint(1, 0),
+		7,
+	},
+}
+
+func TestWire_WalkToCount(t *testing.T) {
+	for _, st := range stepsCountTests {
+		w := Wire{
+			lines: st.lines,
+			ptr:   Point{},
+		}
+
+		steps, ok := w.WalkToCount(st.intersect)
+		if !ok {
+			asserts.FailNow(t, "Not okay.")
+		}
+
+		asserts.Equals(t, st.steps, steps)
+	}
+}
+
+var wireStepCountTests = []struct {
+	name  int
+	wireA []string
+	wireB []string
+	steps int
+}{
+	{
+		1,
+		[]string{"U2", "R2",},
+		[]string{"R2", "U2",},
+		8,
+	},
+	{
+		2,
+		[]string{"R8", "U5", "L5", "D3"},
+		[]string{"U7", "R6", "D4", "L4"},
+		30,
+	},
+	{
+		3,
+		[]string{"R75", "D30", "R83", "U83", "L12", "D49", "R71", "U7", "L72"},
+		[]string{"U62", "R66", "U55", "R34", "D71", "R55", "D58", "R83"},
+		610,
+	},
+	{
+		4,
+		[]string{"R98", "U47", "R26", "D63", "R33", "U87", "L62", "D20", "R33", "U53", "R51"},
+		[]string{"U98", "R91", "D20", "R16", "D67", "R40", "U7", "R15", "U6", "R7"},
+		410,
+	},
+}
+
+func TestGetSmallestStepIntersection(t *testing.T) {
+	for _, wP := range wireStepCountTests {
+		wireA, wireB := createWires(wP.wireA, wP.wireB)
+		fmt.Println(wireA)
+		fmt.Println(wireB)
+		points := wireA.Intersections(wireB)
+		d := GetSmallestStepIntersection(wireA, wireB, points)
+		asserts.Equals(t, wP.steps, d)
 	}
 }

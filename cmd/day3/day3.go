@@ -153,18 +153,51 @@ func (w Wire) Intersections(o Wire) []Point {
 	return is
 }
 
-func findDistanceToClosestIntersection(wireAVectors, wireBVectors []string) int {
+func (w Wire) WalkToCount(p Point) (int, bool) {
+	steps := 0
+
+	for x, l := range w.lines {
+
+		// account for lines having the same end and start.
+		if x > 0 {
+			steps -= 1
+		}
+
+		cp := l.start
+		v := NewVector(maths.ZeroOrOne(l.vector.x), maths.ZeroOrOne(l.vector.y))
+		end := false
+
+		for end == false {
+			if cp == p {
+				return steps, true
+			}
+
+			if cp == l.end {
+				end = true
+			}
+
+			steps += 1
+			cp = cp.AddVector(v)
+		}
+	}
+
+	return 0, false
+}
+
+func createWires(rawA, rawB []string) (Wire, Wire) {
 	wireA := NewWire()
 	wireB := NewWire()
-	for _, vector := range wireAVectors {
+	for _, vector := range rawA {
 		wireA.AddVector(NewVectorFromDirection(vector))
 	}
-	for _, vector := range wireBVectors {
+	for _, vector := range rawB {
 		wireB.AddVector(NewVectorFromDirection(vector))
 	}
 
-	intersections := wireA.Intersections(wireB)
+	return wireA, wireB
+}
 
+func getClosestIntersection(intersections []Point) int {
 	smallest := math.MaxInt64
 	for _, i := range intersections {
 		d := i.ManhattanDistance()
@@ -176,12 +209,38 @@ func findDistanceToClosestIntersection(wireAVectors, wireBVectors []string) int 
 	return smallest
 }
 
+func GetSmallestStepIntersection(wireA, wireB Wire, intersections []Point) int {
+	smallest := math.MaxInt64
+
+	for _, p := range intersections {
+
+		l1, ok := wireA.WalkToCount(p)
+		if !ok {
+			log.Fatal("WireA doesn't intersect")
+		}
+
+		l2, ok := wireB.WalkToCount(p)
+		if !ok {
+			log.Fatal("WireB doesn't intersect")
+		}
+
+		l := l1 + l2
+		if l < smallest && l > 0 {
+			smallest = l
+		}
+	}
+
+	return smallest
+}
+
 func main() {
 	rawWireVectors := files.Load("cmd/day3/input.txt", "\n")
-	WireAVectors := strings.Split(rawWireVectors[0], ",")
-	WireBVectors := strings.Split(rawWireVectors[1], ",")
+	rawWireA := strings.Split(rawWireVectors[0], ",")
+	rawWireB := strings.Split(rawWireVectors[1], ",")
 
-	smallest := findDistanceToClosestIntersection(WireAVectors, WireBVectors)
+	wireA, wireB := createWires(rawWireA, rawWireB)
+	intersections := wireA.Intersections(wireB)
 
-	log.Println(smallest)
+	log.Printf("Closest intersection: %v \n", getClosestIntersection(intersections))
+	log.Printf("Lowest step intersection: %v \n", GetSmallestStepIntersection(wireA, wireB, intersections))
 }

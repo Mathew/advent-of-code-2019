@@ -29,7 +29,11 @@ var programExecutionTests = []struct {
 
 func TestProgramExecution(t *testing.T) {
 	for _, pet := range programExecutionTests {
-		p := NewIntCodeProgram(pet.initial)
+		p := IntCodeProgram{
+			intCodes: pet.initial,
+			pointer:  0,
+			running:  false,
+		}
 		p.Execute()
 		asserts.Equals(t, pet.exp, p.intCodes)
 	}

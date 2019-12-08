@@ -24,3 +24,32 @@ func StringsToInts(ss ...string) []int {
 	return is
 }
 
+func IntToDigits(i int) []int {
+	remainder := i
+	var digits []int
+
+	if i < 10 {
+		return []int{i}
+	}
+
+	for true {
+		d := remainder % 10
+		digits = append(digits, d)
+
+		if remainder < 10 {
+			break
+		}
+		remainder = remainder / 10
+	}
+
+	return digits
+}
+
+func Reverse(is []int) []int {
+	var n []int
+	for i := len(is)-1; i > -1; i-- {
+		n = append(n, is[i])
+	}
+
+	return n
+}

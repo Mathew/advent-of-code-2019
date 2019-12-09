@@ -18,7 +18,7 @@ func NewPassword(n int) Password {
 		log.Fatal("Invalid password")
 	}
 
-	return Password{converters.Reverse(converters.IntToDigits(n))}
+	return Password{converters.IntToDigits(n)}
 }
 
 func (p Password) hasTwoAdjacentNumbers() bool {
@@ -29,6 +29,30 @@ func (p Password) hasTwoAdjacentNumbers() bool {
 	}
 
 	return false
+}
+
+func (p Password) hasTwoAdjacentNumbersStrict() bool {
+	sequentialCount := 0
+	foundPair := false
+
+	for x := 1; x < len(p.digits); x++ {
+		if p.digits[x-1] == p.digits[x] {
+			sequentialCount += 1
+
+			if x == len(p.digits)-1 && sequentialCount == 1 {
+				return true
+			}
+
+		} else {
+			if sequentialCount == 1 {
+				foundPair = true
+			}
+
+			sequentialCount = 0
+		}
+	}
+
+	return foundPair
 }
 
 func (p Password) eachNumberIncreases() bool {
@@ -60,4 +84,14 @@ func main() {
 	}
 
 	log.Printf("Valid Password Count: %v", c)
+
+	c = 0
+	for x := min; x <= max; x++ {
+		p := NewPassword(x)
+		if p.IsValid() && p.hasTwoAdjacentNumbersStrict() {
+			c += 1
+		}
+	}
+
+	log.Printf("Valid Password Count Strict: %v", c)
 }

@@ -1,4 +1,4 @@
-package main
+package day5
 
 import (
 	"github.com/mathew/advent-of-code-2019/internal/pkg/converters"
@@ -7,24 +7,17 @@ import (
 	"log"
 )
 
-var opCodes = map[int]intcode.OperationFunc{
-	1: intcode.Add,
-	2: intcode.Multiply,
-	3: intcode.Stop,
+func SaveToPosition(program *intcode.Program) *intcode.Program {
+	return program
 }
 
-func partTwo(intCodes []int) {
-	for noun := 0; noun < 100; noun++ {
-		for verb := 0; verb < 100; verb++ {
-			p := intcode.NewProgram(opCodes, intCodes, noun, verb)
-			p.Execute()
+func Output(program *intcode.Program) *intcode.Program {
+	return program
+}
 
-			if p.GetValueAt(0) == 19690720 {
-				log.Printf("Noun: %v Verb: %v", noun, verb)
-				break
-			}
-		}
-	}
+var opCodes = map[int]intcode.OperationFunc{
+	3: SaveToPosition,
+	4: Output,
 }
 
 func main() {
@@ -35,6 +28,4 @@ func main() {
 	prog.Execute()
 
 	log.Println(prog.GetValueAt(0))
-
-	partTwo(intCodes)
 }

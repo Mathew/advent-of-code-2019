@@ -42,12 +42,12 @@ func IntToDigits(i int) []int {
 		remainder = remainder / 10
 	}
 
-	return digits
+	return Reverse(digits)
 }
 
 func Reverse(is []int) []int {
 	var n []int
-	for i := len(is)-1; i > -1; i-- {
+	for i := len(is) - 1; i > -1; i-- {
 		n = append(n, is[i])
 	}
 

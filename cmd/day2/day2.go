@@ -7,16 +7,16 @@ import (
 	"log"
 )
 
-var opCodes = map[int]intcode.OperationFunc{
-	1: intcode.Add,
-	2: intcode.Multiply,
-	3: intcode.Stop,
+var opCodes = map[int]intcode.OperationDesc{
+	1: {2, intcode.Add},
+	2: {2, intcode.Multiply},
+	3: {0, intcode.Stop},
 }
 
 func partTwo(intCodes []int) {
 	for noun := 0; noun < 100; noun++ {
 		for verb := 0; verb < 100; verb++ {
-			p := intcode.NewProgram(opCodes, intCodes, noun, verb)
+			p := intcode.NewProgramWithNounAndVerb(opCodes, intCodes, noun, verb)
 			p.Execute()
 
 			if p.GetValueAt(0) == 19690720 {
@@ -31,7 +31,7 @@ func main() {
 	rawIntCodes := files.Load("cmd/day2/input.txt", ",")
 	intCodes := converters.StringsToInts(rawIntCodes...)
 
-	prog := intcode.NewProgram(opCodes, intCodes, 12, 2)
+	prog := intcode.NewProgramWithNounAndVerb(opCodes, intCodes, 12, 2)
 	prog.Execute()
 
 	log.Println(prog.GetValueAt(0))

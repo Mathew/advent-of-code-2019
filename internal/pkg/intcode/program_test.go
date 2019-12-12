@@ -7,17 +7,17 @@ import (
 	"testing"
 )
 
-var opCodes = map[int]OperationFunc{
-	1: Add,
-	2: Multiply,
-	3: Stop,
+var opCodes = map[int]OperationDesc{
+	1: {2, Add},
+	2: {2, Multiply},
+	3: {0, Stop},
 }
 
 func TestNewProgram(t *testing.T) {
 	rawIntCodes := files.Load("../../../cmd/day2/input.txt", ",")
 	intCodes := converters.StringsToInts(rawIntCodes...)
 
-	prog := NewProgram(opCodes, intCodes, 12, 2)
+	prog := NewProgramWithNounAndVerb(opCodes, intCodes, 12, 2)
 	prog.Execute()
 
 	asserts.Equals(t, 5534943, prog.GetValueAt(0))
@@ -30,7 +30,7 @@ func TestNewProgramPart2(t *testing.T) {
 
 	for noun := 0; noun < 100; noun++ {
 		for verb := 0; verb < 100; verb++ {
-			p := NewProgram(opCodes, intCodes, noun, verb)
+			p := NewProgramWithNounAndVerb(opCodes, intCodes, noun, verb)
 			p.Execute()
 
 			if p.GetValueAt(0) == 19690720 {
@@ -78,4 +78,20 @@ func TestProgramExecution(t *testing.T) {
 		p.Execute()
 		asserts.Equals(t, pet.exp, p.intCodes)
 	}
+}
+
+func TestProgram_getOpCodeValue(t *testing.T) {
+	p := NewProgram(opCodes, []int{2, 3, 0, 1})
+	asserts.Equals(t, 2, p.getOpCodeValue(2))
+
+	p = NewProgram(opCodes, []int{102, 3, 0, 1})
+	asserts.Equals(t, 2, p.getOpCodeValue(102))
+}
+
+func TestProgram_getOpCodeModes(t *testing.T) {
+	p := NewProgram(opCodes, []int{2, 3, 0, 1})
+	asserts.Equals(t, []int{POSITION_MODE, POSITION_MODE}, p.getOpCodeModes(2, 2))
+
+	p = NewProgram(opCodes, []int{102, 3, 0, 1})
+	asserts.Equals(t, []int{IMMEDIATE_MODE, POSITION_MODE}, p.getOpCodeModes(102, 2))
 }

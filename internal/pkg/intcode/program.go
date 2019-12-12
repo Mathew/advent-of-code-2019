@@ -1,20 +1,48 @@
 package intcode
 
-type Program struct {
-	intCodes []int
-	opCodes  map[int]OperationFunc
-	pointer  int
-	running  bool
-}
+import (
+	"github.com/mathew/advent-of-code-2019/internal/pkg/converters"
+	"log"
+)
 
-type OperationFunc func(program *Program) *Program
+type
+(
+	Program struct {
+		intCodes []int
+		opCodes  map[int]OperationDesc
+		pointer  int
+		running  bool
+	}
+	OperationFunc func(program *Program, modes []int) *Program
+	OperationDesc struct {
+		NumArguments int
+		Operation    OperationFunc
+	}
+)
 
-func NewProgram(opCodes map[int]OperationFunc, intCodes []int, noun int, verb int) Program {
+const (
+	POSITION_MODE  = iota
+	IMMEDIATE_MODE = iota
+)
+
+func NewProgramWithNounAndVerb(opCodes map[int]OperationDesc, intCodes []int, noun int, verb int) Program {
 	arr := make([]int, len(intCodes))
 	copy(arr, intCodes)
 
 	arr[1] = noun
 	arr[2] = verb
+
+	return Program{
+		opCodes:  opCodes,
+		intCodes: arr,
+		pointer:  0,
+		running:  false,
+	}
+}
+
+func NewProgram(opCodes map[int]OperationDesc, intCodes []int) Program {
+	arr := make([]int, len(intCodes))
+	copy(arr, intCodes)
 
 	return Program{
 		opCodes:  opCodes,
@@ -32,25 +60,64 @@ func (p *Program) setPointer(pos int) {
 	p.pointer = pos
 }
 
-func (p Program) getIntCodeValue(pos int) int {
-	return p.intCodes[p.intCodes[pos]]
+func (p Program) getIntCodeValue(pos int, mode int) int {
+	if mode == POSITION_MODE {
+		return p.intCodes[p.intCodes[pos]]
+	} else if mode == IMMEDIATE_MODE {
+		return p.intCodes[pos]
+	} else {
+		log.Fatalf("Unrecognised mode: %v", mode)
+	}
+
+	return 0
 }
 
 func (p Program) GetValueAt(pos int) int {
 	return p.intCodes[pos]
 }
 
+func (p Program) getOpCodeValue(opCode int) int {
+	if opCode > 9 {
+		digits := converters.IntToDigits(opCode)
+
+		return digits[len(digits)-1]
+	}
+
+	return opCode
+}
+
+func (p Program) getOpCodeModes(opCode, numParams int) []int {
+	var modes []int
+	if opCode > 9 {
+		digits := converters.IntToDigits(opCode)
+		modes = converters.Reverse(digits[:len(digits)-2])
+	}
+
+	if l := numParams - len(modes); l > 0 {
+		for x := 0; x < l; x++ {
+			modes = append(modes, POSITION_MODE)
+		}
+	}
+
+	return modes
+}
+
 func (p *Program) Execute() {
 	p.running = true
 
-	//for ok := true; ok; ok = p.running {
 	for p.running {
 		opCode := p.intCodes[p.pointer]
+		code := p.getOpCodeValue(opCode)
 
-		if op, ok := p.opCodes[opCode]; ok {
-			op(p)
+		if op, ok := p.opCodes[code]; ok {
+			modes := p.getOpCodeModes(opCode, op.NumArguments)
+			op.Operation(p, modes)
 		} else {
-			Stop(p)
+			Stop(p, []int{})
 		}
 	}
+}
+
+func (p Program) GetResult() []int {
+	return p.intCodes
 }

@@ -85,9 +85,6 @@ func (t Tree) GetDistanceBetweenNodes(value, value2 string) int {
 		log.Fatalf("No intersection found for %v and %v", vals, vals2)
 	}
 
-	v1 := t.nodes[value].GetNodesToParent(intr)
-	v2 := t.nodes[value2].GetNodesToParent(intr)
-	log.Print(len(v1), len(v2))
 	return len(t.nodes[value].GetNodesToParent(intr)) + len(t.nodes[value2].GetNodesToParent(intr))
 }
 

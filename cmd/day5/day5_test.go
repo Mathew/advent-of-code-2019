@@ -25,6 +25,6 @@ func TestProgramExecution(t *testing.T) {
 		p := intcode.NewProgram(opCodes, pet.initial)
 		p.Execute()
 
-		asserts.Equals(t, pet.exp, p.GetResult())
+		asserts.Equals(t, pet.exp, p.GetIntCodes())
 	}
 }

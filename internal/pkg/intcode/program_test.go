@@ -14,7 +14,7 @@ var opCodes = map[int]OperationDesc{
 }
 
 func TestNewProgram(t *testing.T) {
-	rawIntCodes := files.Load("../../../cmd/day2/input.txt", ",")
+	rawIntCodes := files.Load("../../../cmd/day2/inputs.txt", ",")
 	intCodes := converters.StringsToInts(rawIntCodes...)
 
 	prog := NewProgramWithNounAndVerb(opCodes, intCodes, 12, 2)
@@ -24,7 +24,7 @@ func TestNewProgram(t *testing.T) {
 }
 
 func TestNewProgramPart2(t *testing.T) {
-	rawIntCodes := files.Load("../../../cmd/day2/input.txt", ",")
+	rawIntCodes := files.Load("../../../cmd/day2/inputs.txt", ",")
 	intCodes := converters.StringsToInts(rawIntCodes...)
 	found := false
 

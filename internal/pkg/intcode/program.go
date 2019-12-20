@@ -2,6 +2,7 @@ package intcode
 
 import (
 	"github.com/mathew/advent-of-code-2019/internal/pkg/converters"
+	"github.com/mathew/advent-of-code-2019/internal/pkg/generator"
 	"log"
 )
 
@@ -12,6 +13,8 @@ type
 		opCodes  map[int]OperationDesc
 		pointer  int
 		running  bool
+		inputs   generator.Generator
+		output   int
 	}
 	OperationFunc func(program *Program, modes []int) *Program
 	OperationDesc struct {
@@ -37,6 +40,19 @@ func NewProgramWithNounAndVerb(opCodes map[int]OperationDesc, intCodes []int, no
 		intCodes: arr,
 		pointer:  0,
 		running:  false,
+	}
+}
+
+func NewProgramWithInputs(opCodes map[int]OperationDesc, intCodes []int, inputs []int) Program {
+	arr := make([]int, len(intCodes))
+	copy(arr, intCodes)
+
+	return Program{
+		opCodes:  opCodes,
+		intCodes: arr,
+		pointer:  0,
+		running:  false,
+		inputs:   generator.CreateIntGenerator(inputs...),
 	}
 }
 
@@ -118,6 +134,14 @@ func (p *Program) Execute() {
 	}
 }
 
-func (p Program) GetResult() []int {
+func (p Program) GetIntCodes() []int {
 	return p.intCodes
+}
+
+func (p Program) GetResult() int {
+	return p.output
+}
+
+func (p Program) GetInput() (int, bool) {
+	return p.inputs()
 }

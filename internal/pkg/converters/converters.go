@@ -1,8 +1,10 @@
 package converters
 
 import (
+	"fmt"
 	"log"
 	"strconv"
+	"strings"
 )
 
 func StringToInt(s string) int {
@@ -52,4 +54,8 @@ func Reverse(is []int) []int {
 	}
 
 	return n
+}
+
+func IntsToString(delim string, is ...int) string {
+	return strings.Trim(strings.Replace(fmt.Sprint(is), " ", delim, -1), "[]")
 }

@@ -19,7 +19,7 @@ func Multiply(p *Program, modes []int) *Program {
 }
 
 func Stop(p *Program, _ []int) *Program {
-	p.running = false
+	p.state = STOPPED
 
 	return p
 }
@@ -36,6 +36,14 @@ func SaveToPosition(p *Program, modes []int) *Program {
 }
 
 func Output(p *Program, modes []int) *Program {
+	p.output = p.getIntCodeValue(p.pointer+1, modes[0])
+	p.setPointer(p.pointer + 2)
+
+	return p
+}
+
+func OutputAndPause(p *Program, modes []int) *Program {
+	p.state = PAUSED
 	p.output = p.getIntCodeValue(p.pointer+1, modes[0])
 	p.setPointer(p.pointer + 2)
 

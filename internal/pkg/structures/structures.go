@@ -17,3 +17,22 @@ func GetFirstIntersection(arr, arr2 []string) (string, bool) {
 
 	return "", false
 }
+
+func ArrayToMatrices(arr []int, width, height int) [][][]int {
+	numMatrices := len(arr) / width / height
+	var layers [][][]int
+	pointer := 0
+
+	for i := 0; i < numMatrices; i++ {
+		var matrix [][]int
+
+		for j := 0; j < height; j++ {
+			matrix = append(matrix, arr[pointer:pointer+width])
+			pointer += width
+		}
+
+		layers = append(layers, matrix)
+	}
+
+	return layers
+}

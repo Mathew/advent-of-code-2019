@@ -2,8 +2,13 @@ package intcode
 
 import (
 	"github.com/mathew/advent-of-code-2019/internal/pkg/converters"
-	"github.com/mathew/advent-of-code-2019/internal/pkg/generator"
 	"log"
+)
+
+const (
+	STOPPED = iota
+	RUNNING = iota
+	PAUSED  = iota
 )
 
 type
@@ -12,8 +17,8 @@ type
 		intCodes []int
 		opCodes  map[int]OperationDesc
 		pointer  int
-		running  bool
-		inputs   generator.Generator
+		state    int
+		inputs   []int
 		output   int
 	}
 	OperationFunc func(program *Program, modes []int) *Program
@@ -39,7 +44,7 @@ func NewProgramWithNounAndVerb(opCodes map[int]OperationDesc, intCodes []int, no
 		opCodes:  opCodes,
 		intCodes: arr,
 		pointer:  0,
-		running:  false,
+		state:    STOPPED,
 	}
 }
 
@@ -51,8 +56,8 @@ func NewProgramWithInputs(opCodes map[int]OperationDesc, intCodes []int, inputs 
 		opCodes:  opCodes,
 		intCodes: arr,
 		pointer:  0,
-		running:  false,
-		inputs:   generator.CreateIntGenerator(inputs...),
+		state:    STOPPED,
+		inputs:   inputs,
 	}
 }
 
@@ -64,7 +69,7 @@ func NewProgram(opCodes map[int]OperationDesc, intCodes []int) Program {
 		opCodes:  opCodes,
 		intCodes: arr,
 		pointer:  0,
-		running:  false,
+		state:    STOPPED,
 	}
 }
 
@@ -119,9 +124,9 @@ func (p Program) getOpCodeModes(opCode, numParams int) []int {
 }
 
 func (p *Program) Execute() {
-	p.running = true
+	p.state = RUNNING
 
-	for p.running {
+	for p.state == RUNNING {
 		opCode := p.intCodes[p.pointer]
 		code := p.getOpCodeValue(opCode)
 
@@ -142,6 +147,20 @@ func (p Program) GetResult() int {
 	return p.output
 }
 
-func (p Program) GetInput() (int, bool) {
-	return p.inputs()
+func (p *Program) GetInput() (int, bool) {
+	if len(p.inputs) < 1 {
+		return 0, false
+	}
+	v := p.inputs[0]
+	p.inputs = p.inputs[1:]
+
+	return v, true
+}
+
+func (p *Program) AddInput(i int) {
+	p.inputs = append(p.inputs, i)
+}
+
+func (p Program) GetState() int {
+	return p.state
 }

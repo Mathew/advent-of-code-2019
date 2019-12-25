@@ -15,5 +15,9 @@ func Load(filePath string, separator string) []string {
 		log.Fatal(err)
 	}
 
+	if separator == "" {
+		return []string{strings.TrimSpace(string(dat))}
+	}
+
 	return strings.Split(string(dat), separator)
 }

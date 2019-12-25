@@ -4,10 +4,9 @@ type Generator func() (int, bool)
 
 func CreateIntGenerator(inputs ...int) Generator {
 	point := 0
-	l := len(inputs)
 
 	gen := func() (int, bool) {
-		if point >= l {
+		if point >= len(inputs) {
 			return 0, false
 		}
 

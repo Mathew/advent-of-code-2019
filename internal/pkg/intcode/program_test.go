@@ -73,7 +73,7 @@ func TestProgramExecution(t *testing.T) {
 			opCodes:  opCodes,
 			intCodes: pet.initial,
 			pointer:  0,
-			running:  false,
+			state:    false,
 		}
 		p.Execute()
 		asserts.Equals(t, pet.exp, p.intCodes)

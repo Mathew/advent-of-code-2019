@@ -9,8 +9,9 @@ import (
 
 func StringToInt(s string) int {
 	r, err := strconv.Atoi(s)
+
 	if err != nil {
-		log.Fatalf("Cannot convert: %s", s)
+		log.Fatalf("Cannot convert: %s, %v", s, err)
 	}
 
 	return r
@@ -45,6 +46,16 @@ func IntToDigits(i int) []int {
 	}
 
 	return Reverse(digits)
+}
+
+func StringToDigits(s string) []int {
+	var digits []int
+
+	for _, ss := range s {
+		ds := IntToDigits(StringToInt(string(ss)))
+		digits = append(digits, ds...)
+	}
+	return digits
 }
 
 func Reverse(is []int) []int {

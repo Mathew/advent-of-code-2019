@@ -1,11 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"github.com/mathew/advent-of-code-2019/internal/pkg/converters"
 	"github.com/mathew/advent-of-code-2019/internal/pkg/files"
 	"github.com/mathew/advent-of-code-2019/internal/pkg/structures"
 	"log"
 	"math"
+	"strings"
 )
 
 type Layer struct {
@@ -72,6 +74,42 @@ func (img Image) FewestNumLayer(i int) Layer {
 	return layer
 }
 
+func (img Image) DecodeImage() [][]string {
+	var finalImage [][]string
+
+	for i := 0; i < img.height; i++ {
+		finalImage = append(finalImage, make([]string, img.width))
+
+		for j := 0; j < img.width; j++ {
+			for _, l := range img.layers {
+				if l.matrix[i][j] == 2 {
+					continue
+				} else if l.matrix[i][j] == 1 {
+					finalImage[i][j] = "*"
+					break
+				} else if l.matrix[i][j] == 0 {
+					finalImage[i][j] = " "
+					break
+				}
+			}
+		}
+	}
+
+	return finalImage
+}
+
+func renderMatrix(m [][]string) string {
+	var s []string
+	s = append(s, "\n")
+	for i := range m {
+		for _, n := range m[i] {
+			s = append(s, fmt.Sprintf(" %v ", n))
+		}
+		s = append(s, "\n")
+	}
+	return strings.Join(s, "")
+}
+
 func main() {
 	raw := files.Load("cmd/day8/input.txt", "")
 	image := rawToImage(raw[0], 25, 6)
@@ -79,4 +117,6 @@ func main() {
 	smallestLayer := image.FewestNumLayer(0)
 	result := smallestLayer.MultipleOfNumsCount(1, 2)
 	log.Printf("Multiple of 1 + 2 present in Layer: %v", result)
+
+	log.Print(renderMatrix(image.DecodeImage()))
 }

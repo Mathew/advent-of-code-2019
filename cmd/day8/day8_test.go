@@ -34,6 +34,6 @@ func TestImage_FewestNumLayer(t *testing.T) {
 		{3, 4, 5,},
 	})
 
-	img := NewImage([]Layer{l1, l2})
+	img := NewImage([]Layer{l1, l2}, 1, 1)
 	asserts.Equals(t, l2, img.FewestNumLayer(0))
 }

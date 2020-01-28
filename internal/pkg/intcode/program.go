@@ -14,12 +14,13 @@ const (
 type
 (
 	Program struct {
-		intCodes []int
-		opCodes  map[int]OperationDesc
-		pointer  int
-		state    int
-		inputs   []int
-		output   int
+		intCodes            []int
+		opCodes             map[int]OperationDesc
+		pointer             int
+		relativeBasePointer int
+		state               int
+		inputs              []int
+		outputs             []int
 	}
 	OperationFunc func(program *Program, modes []int) *Program
 	OperationDesc struct {
@@ -31,6 +32,7 @@ type
 const (
 	POSITION_MODE  = iota
 	IMMEDIATE_MODE = iota
+	RELATIVE_MODE  = iota
 )
 
 func NewProgramWithNounAndVerb(opCodes map[int]OperationDesc, intCodes []int, noun int, verb int) Program {
@@ -41,10 +43,11 @@ func NewProgramWithNounAndVerb(opCodes map[int]OperationDesc, intCodes []int, no
 	arr[2] = verb
 
 	return Program{
-		opCodes:  opCodes,
-		intCodes: arr,
-		pointer:  0,
-		state:    STOPPED,
+		opCodes:             opCodes,
+		intCodes:            arr,
+		pointer:             0,
+		relativeBasePointer: 0,
+		state:               STOPPED,
 	}
 }
 
@@ -53,11 +56,12 @@ func NewProgramWithInputs(opCodes map[int]OperationDesc, intCodes []int, inputs 
 	copy(arr, intCodes)
 
 	return Program{
-		opCodes:  opCodes,
-		intCodes: arr,
-		pointer:  0,
-		state:    STOPPED,
-		inputs:   inputs,
+		opCodes:             opCodes,
+		intCodes:            arr,
+		pointer:             0,
+		relativeBasePointer: 0,
+		state:               STOPPED,
+		inputs:              inputs,
 	}
 }
 
@@ -66,19 +70,30 @@ func NewProgram(opCodes map[int]OperationDesc, intCodes []int) Program {
 	copy(arr, intCodes)
 
 	return Program{
-		opCodes:  opCodes,
-		intCodes: arr,
-		pointer:  0,
-		state:    STOPPED,
+		opCodes:             opCodes,
+		intCodes:            arr,
+		pointer:             0,
+		relativeBasePointer: 0,
+		state:               STOPPED,
 	}
 }
 
-func (p *Program) setValue(pos, value int) {
-	p.intCodes[p.intCodes[pos]] = value
+func (p *Program) setValue(pos, value int, mode int) {
+	if mode == POSITION_MODE {
+		p.intCodes[p.intCodes[pos]] = value
+	} else if mode == RELATIVE_MODE {
+		p.intCodes[p.relativeBasePointer+p.intCodes[pos]] = value
+	} else {
+		log.Fatalf("Unsupported write mode: %v", mode)
+	}
 }
 
 func (p *Program) setPointer(pos int) {
 	p.pointer = pos
+}
+
+func (p *Program) SetRelativePointer(i int) {
+	p.relativeBasePointer = i
 }
 
 func (p Program) getIntCodeValue(pos int, mode int) int {
@@ -86,6 +101,8 @@ func (p Program) getIntCodeValue(pos int, mode int) int {
 		return p.intCodes[p.intCodes[pos]]
 	} else if mode == IMMEDIATE_MODE {
 		return p.intCodes[pos]
+	} else if mode == RELATIVE_MODE {
+		return p.intCodes[p.relativeBasePointer+p.intCodes[pos]]
 	} else {
 		log.Fatalf("Unrecognised mode: %v", mode)
 	}
@@ -144,7 +161,11 @@ func (p Program) GetIntCodes() []int {
 }
 
 func (p Program) GetResult() int {
-	return p.output
+	return p.outputs[len(p.outputs)-1]
+}
+
+func (p Program) GetResults() []int {
+	return p.outputs
 }
 
 func (p *Program) GetInput() (int, bool) {
@@ -163,4 +184,8 @@ func (p *Program) AddInput(i int) {
 
 func (p Program) GetState() int {
 	return p.state
+}
+
+func (p *Program) AddOutput(i int) {
+	p.outputs = append(p.outputs, i)
 }

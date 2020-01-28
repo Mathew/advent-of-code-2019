@@ -14,7 +14,7 @@ var opCodes = map[int]OperationDesc{
 }
 
 func TestNewProgram(t *testing.T) {
-	rawIntCodes := files.Load("../../../cmd/day2/inputs.txt", ",")
+	rawIntCodes := files.Load("../../../cmd/day2/input.txt", ",")
 	intCodes := converters.StringsToInts(rawIntCodes...)
 
 	prog := NewProgramWithNounAndVerb(opCodes, intCodes, 12, 2)
@@ -24,7 +24,7 @@ func TestNewProgram(t *testing.T) {
 }
 
 func TestNewProgramPart2(t *testing.T) {
-	rawIntCodes := files.Load("../../../cmd/day2/inputs.txt", ",")
+	rawIntCodes := files.Load("../../../cmd/day2/input.txt", ",")
 	intCodes := converters.StringsToInts(rawIntCodes...)
 	found := false
 
@@ -73,7 +73,7 @@ func TestProgramExecution(t *testing.T) {
 			opCodes:  opCodes,
 			intCodes: pet.initial,
 			pointer:  0,
-			state:    false,
+			state:    STOPPED,
 		}
 		p.Execute()
 		asserts.Equals(t, pet.exp, p.intCodes)
@@ -95,3 +95,4 @@ func TestProgram_getOpCodeModes(t *testing.T) {
 	p = NewProgram(opCodes, []int{102, 3, 0, 1})
 	asserts.Equals(t, []int{IMMEDIATE_MODE, POSITION_MODE}, p.getOpCodeModes(102, 2))
 }
+

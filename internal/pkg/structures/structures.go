@@ -36,3 +36,7 @@ func ArrayToMatrices(arr []int, width, height int) [][][]int {
 
 	return layers
 }
+
+func ArrayPop(arr *[]int) int {
+	return arr[0]
+}
